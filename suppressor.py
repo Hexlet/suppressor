@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3
 
 """Usage: suppressor [-h] pass COMMAND
           suppressor [-h] fail COMMAND
@@ -12,17 +12,23 @@ Options:
 """
 
 import sys
-from subprocess import run, PIPE
+from subprocess import Popen, PIPE
 from docopt import docopt
+
+def main(docopt_args):
+    p = Popen(ARGS["COMMAND"], shell=True, stdout=PIPE, stderr=PIPE)
+    output, err = p.communicate()
+    if docopt_args["pass"]:
+        if p.returncode != 0:
+            print(err.decode(), file=sys.stderr)
+            exit(1)
+
+    if docopt_args["fail"]:
+        if p.returncode == 0:
+            print(output.decode(), file=sys.stderr)
+            exit(1)
 
 if __name__ == '__main__':
     ARGS = docopt(__doc__)
-    result = run(ARGS["COMMAND"], shell=True, stdout=PIPE, stderr=PIPE)
-
-    if result.returncode != 0 and ARGS["pass"]:
-        print(result.stderr.decode(), file=sys.stderr)
-        exit(1)
-    elif result.returncode == 0 and ARGS["fail"]:
-        print(result.stdout.decode(), file=sys.stderr)
-        exit(1)
+    main(ARGS)
 
