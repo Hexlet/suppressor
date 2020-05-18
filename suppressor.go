@@ -25,8 +25,8 @@ func main() {
 
 
   if (mode == "pass") {
+    fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
     if ( err != nil ) {
-      fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
       fmt.Fprintf(os.Stdout,"%s \n", prepare_output(fmt.Sprint(err)))
       fmt.Fprintf(os.Stdout,"\033[91m Expected tests to pass, but error occurred. See output above. \033[0m \n")
       os.Exit(1)
@@ -36,11 +36,12 @@ func main() {
   }
 
   if (mode == "fail") {
+    fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
     if ( err == nil ) {
-      fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
       fmt.Fprintf(os.Stdout, "\033[91m Expected tests to fail, but they passed. See output above. \033[0m \n")
       os.Exit(1)
     } else {
+      fmt.Fprintf(os.Stdout,"%s \n", prepare_output(fmt.Sprint(err)))
       fmt.Fprintf(os.Stdout,"\u001b[32m Expected tests to fail, recieved tests failed\033[0m \n")
     }
   }
