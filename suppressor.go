@@ -30,7 +30,7 @@ func main() {
 			fmt.Fprintf(os.Stdout, "\033[91m Expected tests to pass, but error occurred. See output above. \033[0m \n")
 			os.Exit(1)
 		} else {
-			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to pass, recieved tests passed\033[0m \n")
+			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to pass, recieved tests passed. \033[0m \n")
 		}
 	}
 
@@ -41,7 +41,7 @@ func main() {
 			os.Exit(1)
 		} else {
 			fmt.Fprintf(os.Stdout, "%s \n", prepare_output(fmt.Sprint(err)))
-			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to fail, recieved tests failed\033[0m \n")
+			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to fail, recieved tests failed. \033[0m \n")
 		}
 	}
 }
