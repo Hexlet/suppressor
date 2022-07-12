@@ -1,0 +1,4 @@
+#	
+#	exit status 1
+ 
+[91m Expected tests to pass, but error occurred. See output above. [0m 
