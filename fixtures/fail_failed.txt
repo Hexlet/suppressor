@@ -1,0 +1,4 @@
+#	
+#	exit status 1
+ 
+[32m Expected tests to fail, recieved tests failed. [0m 

@@ -1,47 +1,89 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
-func prepare_output(output string) string {
-	splitted_list := strings.Split(output, "\n")
+var (
+	red   = color.New(color.FgHiRed)
+	green = color.New(color.FgGreen)
+)
 
-	joined_str := strings.Join(splitted_list, "\n#\t")
-	return "#\t" + joined_str + "\n"
+func init() {
+	red.EnableColor()
+	green.EnableColor()
 }
 
-func main() {
+func writeOutput(output string, b *strings.Builder) {
+	scanner := bufio.NewScanner(strings.NewReader(output))
+	scanner.Split(bufio.ScanRunes)
 
-	mode := os.Args[1]
+	b.WriteString("#\t")
 
-	args := strings.Split(os.Args[2], " ")
-	cmd := exec.Command(args[0], args[1:]...)
+	for scanner.Scan() {
+		if scanner.Text() == "\n" {
+			b.WriteString("\n#\t")
+			continue
+		}
+
+		b.Write(scanner.Bytes())
+	}
+
+	b.WriteString("\n")
+}
+
+func checkCommand(mode, name string, args []string) (*strings.Builder, int) {
+	cmd := exec.Command(name, args...)
 
 	stdout, err := cmd.CombinedOutput()
 
+	var b strings.Builder
+
 	if mode == "pass" {
-		fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
+		writeOutput(string(stdout), &b)
+
 		if err != nil {
-			fmt.Fprintf(os.Stdout, "%s \n", prepare_output(fmt.Sprint(err)))
-			fmt.Fprintf(os.Stdout, "\033[91m Expected tests to pass, but error occurred. See output above. \033[0m \n")
-			os.Exit(1)
-		} else {
-			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to pass, recieved tests passed. \033[0m \n")
+			writeOutput(err.Error(), &b)
+			b.WriteString(" \n")
+			b.WriteString(red.Sprint(" Expected tests to pass, but error occurred. See output above. "))
+			b.WriteString(" \n")
+			return &b, 1
 		}
+
+		b.WriteString(green.Sprint(" Expected tests to pass, recieved tests passed. "))
+		b.WriteString(" \n")
 	}
 
 	if mode == "fail" {
-		fmt.Fprintf(os.Stdout, prepare_output(string(stdout)))
+		writeOutput(string(stdout), &b)
+
 		if err == nil {
-			fmt.Fprintf(os.Stdout, "\033[91m Expected tests to fail, but they passed. See output above. \033[0m \n")
-			os.Exit(1)
-		} else {
-			fmt.Fprintf(os.Stdout, "%s \n", prepare_output(fmt.Sprint(err)))
-			fmt.Fprintf(os.Stdout, "\u001b[32m Expected tests to fail, recieved tests failed. \033[0m \n")
+			b.WriteString(red.Sprint(" Expected tests to fail, but they passed. See output above. "))
+			b.WriteString(" \n")
+			return &b, 1
 		}
+
+		writeOutput(err.Error(), &b)
+		b.WriteString(" \n")
+		b.WriteString(green.Sprint(" Expected tests to fail, recieved tests failed. "))
+		b.WriteString(" \n")
 	}
+
+	return &b, 0
+}
+
+func main() {
+	mode := os.Args[1]
+	args := strings.Split(os.Args[2], " ")
+
+	out, code := checkCommand(mode, args[0], args[1:])
+
+	fmt.Print(out)
+	os.Exit(code)
 }
