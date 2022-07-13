@@ -6,7 +6,19 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/fatih/color"
 )
+
+var (
+	red   = color.New(color.FgHiRed)
+	green = color.New(color.FgGreen)
+)
+
+func init() {
+	red.EnableColor()
+	green.EnableColor()
+}
 
 func writeOutput(output string, b *strings.Builder) {
 	scanner := bufio.NewScanner(strings.NewReader(output))
@@ -38,23 +50,29 @@ func checkCommand(mode, name string, args []string) (*strings.Builder, int) {
 
 		if err != nil {
 			writeOutput(err.Error(), &b)
-			b.WriteString(" \n\033[91m Expected tests to pass, but error occurred. See output above. \033[0m \n")
+			b.WriteString(" \n")
+			b.WriteString(red.Sprint(" Expected tests to pass, but error occurred. See output above. "))
+			b.WriteString(" \n")
 			return &b, 1
 		}
 
-		b.WriteString("\u001b[32m Expected tests to pass, recieved tests passed. \033[0m \n")
+		b.WriteString(green.Sprint(" Expected tests to pass, recieved tests passed. "))
+		b.WriteString(" \n")
 	}
 
 	if mode == "fail" {
 		writeOutput(string(stdout), &b)
 
 		if err == nil {
-			b.WriteString("\033[91m Expected tests to fail, but they passed. See output above. \033[0m \n")
+			b.WriteString(red.Sprint(" Expected tests to fail, but they passed. See output above. "))
+			b.WriteString(" \n")
 			return &b, 1
 		}
 
 		writeOutput(err.Error(), &b)
-		b.WriteString(" \n\u001b[32m Expected tests to fail, recieved tests failed. \033[0m \n")
+		b.WriteString(" \n")
+		b.WriteString(green.Sprint(" Expected tests to fail, recieved tests failed. "))
+		b.WriteString(" \n")
 	}
 
 	return &b, 0
