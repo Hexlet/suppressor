@@ -6,3 +6,6 @@ test:
 
 tidy:
 	go mod tidy
+
+update-deps:
+	go get -u all && go mod tidy
