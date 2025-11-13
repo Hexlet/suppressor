@@ -3,3 +3,6 @@ install:
 
 test:
 	go test -count=1 .
+
+tidy:
+	go mod tidy
