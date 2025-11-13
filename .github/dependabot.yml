@@ -1,0 +1,29 @@
+---
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps-actions)
+    labels: [deps, ci]
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+  # Go modules (gomod)
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps-gomod)
+    labels: [deps, go]
+    groups:
+      go-minor-patch:
+        update-types: [minor, patch]
