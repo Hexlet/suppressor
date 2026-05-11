@@ -5,13 +5,8 @@ test:
 	go test -count=1 .
 
 release:
-	@NEXT=$(shell svu next); \
-	CURRENT=$(shell svu current); \
-	if [ "$$NEXT" = "$$CURRENT" ]; then \
-		echo "Nothing to release: no new commits since $$CURRENT"; \
-		exit 1; \
-	fi; \
-	git tag $$NEXT && git push origin $$NEXT
+	git tag $(shell svu patch)
+	git push origin $(shell svu current)
 
 tidy:
 	go mod tidy
