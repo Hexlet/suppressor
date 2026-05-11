@@ -5,8 +5,7 @@ test:
 	go test -count=1 .
 
 release:
-	git tag $(shell svu patch)
-	git push origin $(shell svu current)
+	@NEXT=$$(svu patch) && git tag $$NEXT && git push origin $$NEXT
 
 tidy:
 	go mod tidy
