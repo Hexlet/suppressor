@@ -5,8 +5,13 @@ test:
 	go test -count=1 .
 
 release:
-	git tag $(shell svu next)
-	git push origin $(shell git describe --tags --abbrev=0)
+	@NEXT=$(shell svu next); \
+	CURRENT=$(shell svu current); \
+	if [ "$$NEXT" = "$$CURRENT" ]; then \
+		echo "Nothing to release: no new commits since $$CURRENT"; \
+		exit 1; \
+	fi; \
+	git tag $$NEXT && git push origin $$NEXT
 
 tidy:
 	go mod tidy
